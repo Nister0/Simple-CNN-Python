@@ -18,14 +18,21 @@ class Greyscaler:
             Based on the Average of each color.
             Easy to implement but not optimal
         '''
-        h, w = image.shape
-
-        output = np.zeros((h, w), dtype=tuple(int))
+        # ensure image is RGB so getpixel returns an (r,g,b) tuple
+        image = image.convert("RGB")
+        w, h = image.size
+        output = np.zeros((h, w, 3), dtype=np.uint8)
 
         for i in range(h):
             for j in range(w):
-                r, g, b = image.getpixel((i, j))
-                avg = (r+g+b) // 3
+                r, g, b = image.getpixel((j, i))
+                avg = (r + g + b) // 3
                 output[i, j] = (avg, avg, avg)
-                
+
         return output
+    
+im = Image.open("Testimage.png")
+im.show()
+greyscale = Greyscaler()
+grey_output = greyscale.average(im)
+Image.fromarray(grey_output, "RGB").show()
