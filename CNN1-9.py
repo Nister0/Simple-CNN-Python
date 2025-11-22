@@ -40,7 +40,7 @@ class Greyscaler:
     
 class Conv:
     #Class to add customizable convulution layers 
-    def __init__(self, size, num_filters, padding = False, variance = 9):
+    def __init__(self, size, num_filters, padding = 0, variance = 9):
         self.size = size
         self.num_filter = num_filters
         self.padding = padding
@@ -72,6 +72,7 @@ class Conv:
                 else:
                     r,g,b = image.getpixel((j, i))
                     padded_image[i,j] = (r,g,b)
+
         return Image.fromarray(padded_image, "RGB")
 
 
