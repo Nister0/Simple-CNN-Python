@@ -1,6 +1,12 @@
 '''
+Project Based on:
 https://victorzhou.com/blog/intro-to-cnns-part-1/
+
+Implemented:
 Greyscaler. - its implemented in Pillow but i want to be minimal.
+
+Planned: 
+other greyscalers
 3x3 conv layer - transforms layer for example find edges
 2x2 pooling layer - downscale image
 softmax layer -> turn output into probabilities
@@ -10,6 +16,7 @@ from PIL import Image
 import numpy as np 
 
 class Greyscaler:
+    #class to greyscale images
     def __init__(self):
         pass
 
@@ -31,8 +38,21 @@ class Greyscaler:
 
         return output
     
+class Conv:
+    #Class to add customizable convulution layers 
+    def __init__(self, size, num_filters, padding = False, variance = 9):
+        self.size = size
+        self.num_filter = num_filters
+        self.padding = padding
+        self.variance = variance
+        self.filters = np.randn(num_filters, size, size) / variance
+
+    def iterate_regions(self, image):
+        
+
+    
 im = Image.open("Testimage.png")
-im.show()
+#im.show()
 greyscale = Greyscaler()
 grey_output = greyscale.average(im)
-Image.fromarray(grey_output, "RGB").show()
+imgr = Image.fromarray(grey_output, "RGB")
