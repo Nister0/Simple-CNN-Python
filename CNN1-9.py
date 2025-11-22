@@ -47,10 +47,40 @@ class Conv:
         self.variance = variance
         self.filters = np.randn(num_filters, size, size) / variance
 
-    def iterate_regions(self, image):
+    def pad_image(self, image):
         
+        h,w = image.size
 
-    
+        padding = self.padding
+
+        size = self.size
+
+        new_h, new_w = h+size, w+size
+
+        padded_image = np.zeros((new_h, new_w, 3), dtype =np.uint8)
+
+        for i in range(new_h):
+            for j in range(new_w):
+                if i <= padding:
+                    padded_image[i,j] = (0,0,0)
+                elif i >= new_h-padding:
+                    padded_image[i,j] = (0,0,0)
+                elif j <= padding: 
+                    padded_image[i,j] = (0,0,0)
+                elif j >= new_w-padding:
+                    padded_image[i,j] = (0,0,0)
+                else:
+                    r,g,b = image.getpixel((j, i))
+                    padded_image[i,j] = (r,g,b)
+        return Image.fromarray(padded_image, "RGB")
+
+
+    def iterate_regions(self, image):
+        '''
+        Generates all size x size image regions using the padded image.
+        '''
+        pass    
+
 im = Image.open("Testimage.png")
 #im.show()
 greyscale = Greyscaler()
