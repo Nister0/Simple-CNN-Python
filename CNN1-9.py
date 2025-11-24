@@ -45,7 +45,7 @@ class Conv:
         self.num_filter = num_filters
         self.padding = padding
         self.variance = variance
-        self.filters = np.randn(num_filters, size, size) / variance
+        self.filters = np.random.randn(num_filters, size, size) / variance
 
     def pad_image(self, image):
         
@@ -53,27 +53,29 @@ class Conv:
 
         padding = self.padding
 
-        size = self.size
-
-        new_h, new_w = h+size, w+size
+        new_h, new_w = h+(padding*2), w+(padding*2)
 
         padded_image = np.zeros((new_h, new_w, 3), dtype =np.uint8)
 
+        #print((new_h,new_w,h,w,padding))
+
         for i in range(new_h):
             for j in range(new_w):
-                if i <= padding:
-                    padded_image[i,j] = (0,0,0)
+                if i < padding:
+                    padded_image[i,j] = (255,255,255)
                 elif i >= new_h-padding:
-                    padded_image[i,j] = (0,0,0)
-                elif j <= padding: 
-                    padded_image[i,j] = (0,0,0)
+                    padded_image[i,j] = (255,255,255)
+                elif j < padding: 
+                    padded_image[i,j] = (255,255,255)
                 elif j >= new_w-padding:
-                    padded_image[i,j] = (0,0,0)
+                    padded_image[i,j] = (255,255,255)
                 else:
-                    r,g,b = image.getpixel((j, i))
+                    #print((i,j))
+                    #print((new_h,new_w,h,w,padding))
+                    r,g,b = image.getpixel((i-padding, j-padding))
                     padded_image[i,j] = (r,g,b)
 
-        return Image.fromarray(padded_image, "RGB")
+        return padded_image
 
 
     def iterate_regions(self, image):
@@ -86,4 +88,17 @@ im = Image.open("Testimage.png")
 #im.show()
 greyscale = Greyscaler()
 grey_output = greyscale.average(im)
-imgr = Image.fromarray(grey_output, "RGB")
+imgr = Image.fromarray(grey_output)
+
+arr = np.zeros((5,5,3), dtype = np.uint8)
+for i in range(5):
+    for j in range(5):
+        if (i+j) % 2 == 0:
+            arr[i, j] = (255, 55, 255)
+        else:
+            arr[i,j] = (50, 100, 255)
+
+testimg = Image.fromarray(arr)
+conv = Conv(3, 1, 1)
+impadded = Image.fromarray(conv.pad_image(testimg))
+impadded.show()
