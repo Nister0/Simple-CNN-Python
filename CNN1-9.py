@@ -49,7 +49,7 @@ class Conv:
 
     def pad_image(self, image):
         
-        h,w = image.size
+        w, h = image.size
 
         padding = self.padding
 
@@ -100,5 +100,5 @@ for i in range(5):
 
 testimg = Image.fromarray(arr)
 conv = Conv(3, 1, 1)
-impadded = Image.fromarray(conv.pad_image(testimg))
+impadded = Image.fromarray(conv.pad_image(imgr))
 impadded.show()
