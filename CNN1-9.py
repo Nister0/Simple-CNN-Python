@@ -53,25 +53,23 @@ class Conv:
 
         padding = self.padding
 
-        new_h, new_w = h+(padding*2), w+(padding*2)
+        new_w, new_h = w+(padding*2), h+(padding*2)
 
         padded_image = np.zeros((new_h, new_w, 3), dtype =np.uint8)
-
-        #print((new_h,new_w,h,w,padding))
 
         for i in range(new_h):
             for j in range(new_w):
                 if i < padding:
                     padded_image[i,j] = (255,255,255)
-                elif i >= new_h-padding:
+                elif i >= new_w-padding:
                     padded_image[i,j] = (255,255,255)
                 elif j < padding: 
                     padded_image[i,j] = (255,255,255)
-                elif j >= new_w-padding:
+                elif j >= new_h-padding:
                     padded_image[i,j] = (255,255,255)
                 else:
-                    #print((i,j))
-                    #print((new_h,new_w,h,w,padding))
+                    print((i,j))
+                    print((new_w, new_h, w, h, padding))
                     r,g,b = image.getpixel((i-padding, j-padding))
                     padded_image[i,j] = (r,g,b)
 
@@ -99,6 +97,6 @@ for i in range(5):
             arr[i,j] = (50, 100, 255)
 
 testimg = Image.fromarray(arr)
-conv = Conv(3, 1, 1)
+conv = Conv(3, 1, 20)
 impadded = Image.fromarray(conv.pad_image(imgr))
 impadded.show()
