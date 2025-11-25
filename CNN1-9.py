@@ -57,41 +57,49 @@ class Conv:
         new_w = w+(padding*2)
         new_h = h+(padding*2)
 
-        padded_image = np.zeros((new_h, new_w, 3), dtype =np.uint8)
+        output = np.zeros((new_h, new_w, 3), dtype =np.uint8)
 
         for i in range(new_h):
             for j in range(new_w):
                 if i < padding:
-                    padded_image[i,j] = (255,110,255)
+                    output[i,j] = (0,0,0)
                 elif i >= new_h-padding:
-                    padded_image[i,j] = (255,110,255)
+                    output[i,j] = (0,0,0)
                 elif j < padding: 
-                    padded_image[i,j] = (255,110,255)
+                    output[i,j] = (0,0,0)
                 elif j >= new_w-padding:
-                    padded_image[i,j] = (255,110,255)
+                    output[i,j] = (0,0,0)
                 else:
-                    print((i,j))
-                    print((new_h, new_w, h, w, padding))
                     r,g,b = image.getpixel((j-padding, i-padding))
-                    padded_image[i,j] = (r,g,b)
+                    output[i,j] = (r,g,b)
 
-        return padded_image
+        return output
 
 
     def iterate_regions(self, image):
         '''
         Generates all size x size image regions using the padded image.
         '''
-        pass    
+
+        w, h = image.size
+
+        offset = (self.size // 2) * 2 
+
+        for i in range(h-offset):
+            for j in range(w-offset):
+                get_region = False
+
+
+        return get_region
 
 im = Image.open("Testimage.png")
 #im.show()
 greyscale = Greyscaler()
 grey_output = greyscale.average(im)
 imgr = Image.fromarray(grey_output)
-imgr.show()
+#imgr.show()
 
-arr = np.zeros((5,5,3), dtype = np.uint8)
+'''arr = np.zeros((5,5,3), dtype = np.uint8)
 for i in range(5):
     for j in range(5):
         if (i+j) % 2 == 0:
@@ -99,8 +107,8 @@ for i in range(5):
         else:
             arr[i,j] = (50, 100, 255)
 
-testimg = Image.fromarray(arr)
+testimg = Image.fromarray(arr)'''
 
 conv = Conv(3, 1, 1)
 impadded = Image.fromarray(conv.pad_image(imgr))
-impadded.show()
+#impadded.show()
