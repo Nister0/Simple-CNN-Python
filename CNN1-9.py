@@ -4,6 +4,7 @@ https://victorzhou.com/blog/intro-to-cnns-part-1/
 
 Implemented:
 Greyscaler. - its implemented in Pillow but i want to be minimal.
+              So im implementing it manually 
 
 Planned: 
 other greyscalers
@@ -26,22 +27,26 @@ class Greyscaler:
         Based on the Average of each color.
         Easy to implement but not optimal
         '''
-        # ensure image is RGB so getpixel returns an (r,g,b) tuple
+        '''ensure image is RGB so getpixel returns an (r,g,b) tuple'''
         image = image.convert("RGB")
+
         w, h = image.size
+
         output = np.zeros((h, w, 3), dtype=np.uint8)
 
         for i in range(h):
             for j in range(w):
                 r, g, b = image.getpixel((j, i))
                 avg = (r + g + b) // 3
-                output[i, j] = (avg, avg, avg)
-
+                output[i, j] = (avg, avg, avg) 
+                '''maybe i will make the output a 1d array as i only need one value to optimize the storage and runspeed'''
         return output
     
 class Conv:
-    #Class to add customizable convulution layers 
+    '''Class to add customizable convulution layers i.e. 3x3, 5x5 and so on'''
+
     def __init__(self, size, num_filters, padding = 0, variance = 9):
+
         self.size = size
         self.num_filter = num_filters
         self.padding = padding
@@ -72,14 +77,12 @@ class Conv:
                 else:
                     r,g,b = image.getpixel((j-padding, i-padding))
                     output[i,j] = (r,g,b)
-
+                    '''same as in the greyscaler -> 1d array.'''
         return output
 
 
     def iterate_regions(self, image):
-        '''
-        Generates all size x size image regions using the padded image.
-        '''
+        '''Generates all size x size image regions using the padded image if wanted.'''
 
         w, h = image.size
 
@@ -94,6 +97,8 @@ class Conv:
 
 im = Image.open("Testimage.png")
 #im.show()
+
+'''Tests for the Greyscale class and functions.'''
 greyscale = Greyscaler()
 grey_output = greyscale.average(im)
 imgr = Image.fromarray(grey_output)
@@ -109,6 +114,7 @@ for i in range(5):
 
 testimg = Image.fromarray(arr)'''
 
+'''Test for the padding function'''
 conv = Conv(3, 1, 1)
 impadded = Image.fromarray(conv.pad_image(imgr))
 #impadded.show()
