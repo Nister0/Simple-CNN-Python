@@ -27,6 +27,7 @@ class Greyscaler:
         Based on the Average of each color.
         Easy to implement but not optimal
         '''
+
         '''ensure image is RGB so getpixel returns an (r,g,b) tuple'''
         image = image.convert("RGB")
 
