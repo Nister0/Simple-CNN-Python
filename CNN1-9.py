@@ -15,6 +15,7 @@ softmax layer -> turn output into probabilities
 
 from PIL import Image 
 import numpy as np 
+import mnist
 
 class Greyscaler:
     #class to greyscale images
@@ -33,16 +34,17 @@ class Greyscaler:
 
         w, h = image.size
 
-        output = np.zeros((h, w, 3), dtype=np.uint8)
+        output = np.zeros((h, w), dtype=np.uint8)
 
         for i in range(h):
             for j in range(w):
-                r, g, b = image.getpixel((j, i))
-                avg = (r + g + b) // 3
-                output[i, j] = (avg, avg, avg) 
-                '''maybe i will make the output a 1d array as i only need one value to optimize the storage and runspeed'''
+                r,g,b = image.getpixel((j,i))
+                output[i, j] = self.average_pixel(r,g,b)
+
         return output
     
+    def average_pixel(self, r, g, b):
+        return (r+g+b) / 3
 class Conv:
     '''Class to add customizable convulution layers i.e. 3x3, 5x5 and so on'''
 
@@ -51,11 +53,13 @@ class Conv:
         self.size = size
         self.num_filter = num_filters
         self.padding = padding
-        self.variance = variance
         self.filters = np.random.randn(num_filters, size, size) / variance
 
     def pad_image(self, image):
+
+        image = image.convert("RGB")
         
+        greyscale = Greyscaler()
         w, h = image.size
 
         padding = self.padding
@@ -63,7 +67,7 @@ class Conv:
         new_w = w+(padding*2)
         new_h = h+(padding*2)
 
-        output = np.zeros((new_h, new_w, 3), dtype =np.uint8)
+        output = np.zeros((new_h, new_w), dtype =np.uint8)
 
         for i in range(new_h):
             for j in range(new_w):
@@ -77,45 +81,43 @@ class Conv:
                     output[i,j] = (0,0,0)
                 else:
                     r,g,b = image.getpixel((j-padding, i-padding))
-                    output[i,j] = (r,g,b)
-                    '''same as in the greyscaler -> 1d array.'''
+                    output[i,j] = greyscale.average_pixel(r,g,b)
         return output
-
 
     def iterate_regions(self, image):
         '''Generates all size x size image regions using the padded image if wanted.'''
 
-        w, h = image.size
+        w, h = image.shape
 
         offset = (self.size // 2) * 2 
+        size = self.size
 
         for i in range(h-offset):
             for j in range(w-offset):
-                get_region = False
-
-
-        return get_region
-
-im = Image.open("Testimage.png")
-#im.show()
-
-'''Tests for the Greyscale class and functions.'''
-greyscale = Greyscaler()
-grey_output = greyscale.average(im)
-imgr = Image.fromarray(grey_output)
-#imgr.show()
-
-'''arr = np.zeros((5,5,3), dtype = np.uint8)
-for i in range(5):
-    for j in range(5):
-        if (i+j) % 2 == 0:
-            arr[i, j] = (255, 55, 255)
+                im_region = image[i: (i+size), j:(j+size)]
+                yield im_region
+    
+    def forward(self, input):
+        greyscale = Greyscaler()
+        if self.padding == 0:
+            imgr = greyscale.average(input)
+            w, h = input.size
+            output = np.zeros((h, w, self.num_filter))
         else:
-            arr[i,j] = (50, 100, 255)
+            imgr = self.pad_image(input)
+            w, h = input.size
+            offset = (self.size // 2) * 2 
+            output = np.zeros((h-offset, w-offset, self.num_filter))
 
-testimg = Image.fromarray(arr)'''
+        for im_region, i, j in self.iterate_regions(imgr):
+            output[i,j] = np.sum(im_region * self.filters, axis=(1,2))
 
-'''Test for the padding function'''
-conv = Conv(3, 1, 1)
-impadded = Image.fromarray(conv.pad_image(imgr))
-#impadded.show()
+        return output
+    
+train_images = mnist.train_images()
+train_labels = mnist.train_labels()
+
+#im = Image.open("Testimage.png")
+conv = Conv(3, 8)
+output = conv.forward(train_images[0])
+print(output.shape)
