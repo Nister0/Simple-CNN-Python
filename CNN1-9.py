@@ -51,7 +51,7 @@ class Conv:
     def __init__(self, size, num_filters, padding = 0, variance = 9):
 
         self.size = size
-        self.num_filter = num_filters
+        self.num_filters = num_filters
         self.padding = padding
         self.filters = np.random.randn(num_filters, size, size) / variance
 
@@ -95,29 +95,30 @@ class Conv:
         for i in range(h-offset):
             for j in range(w-offset):
                 im_region = image[i: (i+size), j:(j+size)]
-                yield im_region
+                yield im_region, i, j
     
     def forward(self, input):
         greyscale = Greyscaler()
         if self.padding == 0:
             imgr = greyscale.average(input)
             w, h = input.size
-            output = np.zeros((h, w, self.num_filter))
+            output = np.zeros((h, w, self.num_filters))
         else:
             imgr = self.pad_image(input)
             w, h = input.size
             offset = (self.size // 2) * 2 
-            output = np.zeros((h-offset, w-offset, self.num_filter))
+            output = np.zeros((h-offset, w-offset, self.num_filters))
 
         for im_region, i, j in self.iterate_regions(imgr):
+            print(im_region)
             output[i,j] = np.sum(im_region * self.filters, axis=(1,2))
 
         return output
     
-train_images = Image.fromarray(mnist.train_images())
-train_labels = mnist.train_labels()
+#train_images = Image.fromarray(mnist.train_images())
+#train_labels = mnist.train_labels()
 
-#im = Image.open("Testimage.png")
-conv = Conv(3, 8)
-output = conv.forward(train_images[0])
+im = Image.open("Testimage.png")
+conv = Conv(3, 8) 
+output = conv.forward(im)
 print(output.shape)
