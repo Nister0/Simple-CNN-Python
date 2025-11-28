@@ -114,7 +114,7 @@ class Conv:
 
         return output
     
-train_images = mnist.train_images()
+train_images = Image.fromarray(mnist.train_images())
 train_labels = mnist.train_labels()
 
 #im = Image.open("Testimage.png")
