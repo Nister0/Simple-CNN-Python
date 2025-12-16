@@ -87,10 +87,9 @@ class Conv:
     def iterate_regions(self, image):
         '''Generates all size x size image regions using the padded image if wanted.'''
 
-        w, h = image.shape
-
-        offset = (self.size // 2) * 2 
-        size = self.size
+        h, w = image.shape
+        offset = self.size -1
+        size = self.size       
 
         for i in range(h-offset):
             for j in range(w-offset):
@@ -101,24 +100,27 @@ class Conv:
         greyscale = Greyscaler()
         if self.padding == 0:
             imgr = greyscale.average(input)
-            w, h = input.size
-            output = np.zeros((h, w, self.num_filters))
+            h, w = imgr.shape
+            output = np.zeros((h-(self.size -1), w-(self.size -1), self.num_filters))
         else:
             imgr = self.pad_image(input)
-            w, h = input.size
-            offset = (self.size // 2) * 2 
+            h, w = imgr.shape
+            offset = (self.size -1 )/ 2
             output = np.zeros((h-offset, w-offset, self.num_filters))
 
         for im_region, i, j in self.iterate_regions(imgr):
-            print(im_region)
+            #print(im_region)
+            #print((im_region.shape, self.filters.shape))
             output[i,j] = np.sum(im_region * self.filters, axis=(1,2))
+            
 
         return output
     
-#train_images = Image.fromarray(mnist.train_images())
-#train_labels = mnist.train_labels()
+train_images = mnist.train_images()
+train_labels = mnist.train_labels()
 
-im = Image.open("Testimage.png")
+#im = Image.open("./Testimage.png")
 conv = Conv(3, 8) 
-output = conv.forward(im)
+output = conv.forward(Image.fromarray(train_images[0]))
+imout1 = Image.fromarray(output).show()
 print(output.shape)
